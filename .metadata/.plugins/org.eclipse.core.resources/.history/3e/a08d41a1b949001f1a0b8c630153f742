@@ -1,0 +1,4 @@
+package com.vikas.co.controller;
+@RestController
+@RequestMapping("/api/users")
+public class UserUIController {

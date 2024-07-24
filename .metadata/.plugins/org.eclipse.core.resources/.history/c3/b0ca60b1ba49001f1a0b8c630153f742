@@ -1,0 +1,15 @@
+/*
+ * package com.vikas.co.controller;
+ * 
+ * import org.springframework.web.bind.annotation.GetMapping; import
+ * org.springframework.web.bind.annotation.RestController;
+ * 
+ * 
+ * @RestController public class UserUIController {
+ * 
+ * @GetMapping("/{index.html}") public String getUI() { return
+ * "Wel-come in UI Env... "; }
+ * 
+ * 
+ * }
+ */

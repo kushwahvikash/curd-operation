@@ -1,0 +1,13 @@
+spring.application.name=curd-operation
+# JPA
+spring.jpa.show-sql=true
+
+server.port=8090
+
+spring.datasource.url=jdbc:mysql://localhost/mydb
+
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+
+spring.datasource.username=root
+
+spring.datasource.password=root

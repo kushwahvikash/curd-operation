@@ -1,0 +1,5 @@
+package com.vikas.co.controller;
+
+public class UserController {
+
+}

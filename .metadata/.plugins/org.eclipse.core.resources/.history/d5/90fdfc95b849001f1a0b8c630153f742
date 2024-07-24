@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .form-container input, .form-container select {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 300px;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-edit {
+            background-color: #007bff;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Management</h1>
+    <div class="form-container">
+        <h2>Add User</h2>
+        <input type="text" id="name" placeholder="Name">
+        <input type="email" id="email" placeholder="Email">
+        <select id="gender">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <input type="text" id="mobileNo" placeholder="Mobile No">
+        <input type="text" id="address" placeholder="Address">
+        <button onclick="addUser()">Add User</button>
+    </div>
+    <h2>All Users</h2>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Mobile No</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic Content -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+
+        function loadUsers() {
+            fetch('/api/users')
+                .then(response => response.json())
+                .then(users => {
+                    const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                    userTable.innerHTML = '';
+                    users.forEach(user => {
+                        const row = userTable.insertRow();
+                        row.insertCell(0).innerHTML = user.id;
+                        row.insertCell(1).innerHTML = user.name;
+                        row.insertCell(2).innerHTML = user.email;
+                        row.insertCell(3).innerHTML = user.gender;
+                        row.insertCell(4).innerHTML = user.mobileNo;
+                        row.insertCell(5).innerHTML = user.address;
+                        const actionsCell = row.insertCell(6);
+                        actionsCell.innerHTML = `<button class="btn btn-edit" onclick="editUser(${user.id})">Edit</button>
+                                                 <button class="btn btn-delete" onclick="deleteUser(${user.id})">Delete</button>`;
+                    });
+                });
+        }
+
+        function addUser() {
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                gender: document.getElementById('gender').value,
+                mobileNo: document.getElementById('mobileNo').value,
+                address: document.getElementById('address').value
+            };
+
+            fetch('/api/users/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            }).then(response => {
+                if (response.status === 201) {
+                    loadUsers();
+                }
+            });
+        }
+
+        function editUser(id) {
+            const user = {
+                name: prompt('Enter new name:'),
+                email: prompt('Enter new email:'),
+                gender: prompt('Enter new gender (Male/Female):'),
+                mobileNo: prompt('Enter new mobile number:'),
+                address: prompt('Enter new address:')
+            };
+
+            fetch(`/api/users/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            }).then(response => {
+                if (response.status === 200) {
+                    loadUsers();
+                }
+            });
+        }
+
+        function deleteUser(id) {
+            fetch(`/api/users/${id}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.status === 204) {
+                    loadUsers();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

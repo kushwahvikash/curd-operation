@@ -1,0 +1,107 @@
+// Function to fetch all users and populate the table
+function fetchAllUsers() {
+    fetch('http://localhost:8080/api/users')
+        .then(response => response.json())
+        .then(users => {
+            const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            userTable.innerHTML = '';
+            users.forEach(user => {
+                const row = userTable.insertRow();
+                row.insertCell(0).innerText = user.id;
+                row.insertCell(1).innerText = user.name;
+                row.insertCell(2).innerText = user.email;
+                row.insertCell(3).innerText = user.gender;
+                row.insertCell(4).innerText = user.mobileNo;
+                row.insertCell(5).innerText = user.address;
+                const actionsCell = row.insertCell(6);
+                actionsCell.innerHTML = `
+                    <button onclick="editUser(${user.id})">Edit</button>
+                    <button onclick="deleteUser(${user.id})">Delete</button>
+                `;
+            });
+        });
+}
+
+// Function to create a new user
+function createUser() {
+    const user = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        gender: document.getElementById('gender').value,
+        mobileNo: document.getElementById('mobileNo').value,
+        address: document.getElementById('address').value
+    };
+    fetch('http://localhost:8080/api/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    })
+    .then(response => response.json())
+    .then(data => {
+        fetchAllUsers();
+        clearForm();
+    });
+}
+
+// Function to delete a user
+function deleteUser(id) {
+    fetch(`http://localhost:8080/api/users/${id}`, {
+        method: 'DELETE'
+    })
+    .then(() => fetchAllUsers());
+}
+
+// Function to edit a user
+function editUser(id) {
+    fetch(`http://localhost:8080/api/users/${id}`)
+        .then(response => response.json())
+        .then(user => {
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('gender').value = user.gender;
+            document.getElementById('mobileNo').value = user.mobileNo;
+            document.getElementById('address').value = user.address;
+            const updateButton = document.createElement('button');
+            updateButton.innerText = 'Update User';
+            updateButton.onclick = () => updateUser(id);
+            document.querySelector('.form-group:last-child').appendChild(updateButton);
+        });
+}
+
+// Function to update a user
+function updateUser(id) {
+    const user = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        gender: document.getElementById('gender').value,
+        mobileNo: document.getElementById('mobileNo').value,
+        address: document.getElementById('address').value
+    };
+    fetch(`http://localhost:8080/api/users/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    })
+    .then(response => response.json())
+    .then(() => {
+        fetchAllUsers();
+        clearForm();
+        document.querySelector('button[onclick="updateUser(${id})"]').remove();
+    });
+}
+
+// Function to clear the form
+function clearForm() {
+    document.getElementById('name').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('gender').value = '';
+    document.getElementById('mobileNo').value = '';
+    document.getElementById('address').value = '';
+}
+
+// Fetch all users on page load
+window.onload = fetchAllUsers;

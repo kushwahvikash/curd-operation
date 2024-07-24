@@ -1,0 +1,9 @@
+package com.vikas.co.services;
+
+import com.vikas.co.entity.User;
+
+public interface UserServices {
+
+	User addUser(User user);
+
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Form</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <h2>User Form</h2>
+    <form th:action="@{/api/users}" th:object="${user}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" th:field="*{name}" id="name" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" th:field="*{email}" id="email" required>
+        </div>
+        <div>
+            <label for="gender">Gender:</label>
+            <input type="text" th:field="*{gender}" id="gender" required>
+        </div>
+        <div>
+            <label for="mobileNo">Mobile No:</label>
+            <input type="text" th:field="*{mobileNo}" id="mobileNo" required>
+        </div>
+        <div>
+            <label for="address">Address:</label>
+            <textarea th:field="*{address}" id="address" required></textarea>
+        </div>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</body>
+</html>

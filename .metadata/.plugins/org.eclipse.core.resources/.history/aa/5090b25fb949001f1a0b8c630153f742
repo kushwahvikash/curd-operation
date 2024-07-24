@@ -1,0 +1,3 @@
+@RestController
+@RequestMapping("/api/users")
+public class UserUIController {

@@ -1,0 +1,22 @@
+package com.vikas.co.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vikas.co.entity.User;
+import com.vikas.co.services.UserServices;
+
+
+@RestController
+public class UserController {
+	
+	private UserServices userServices;
+	
+	@GetMapping("add")
+	public User addUser(@RequestBody User user) {
+		return userServices.addUser(user);
+	}
+	
+
+}

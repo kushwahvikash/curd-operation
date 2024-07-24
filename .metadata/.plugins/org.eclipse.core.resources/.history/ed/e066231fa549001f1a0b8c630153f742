@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .action-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Management</h1>
+        
+        <!-- User Form -->
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email">
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender:</label>
+            <input type="text" id="gender">
+        </div>
+        <div class="form-group">
+            <label for="mobileNo">Mobile No:</label>
+            <input type="text" id="mobileNo">
+        </div>
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" id="address">
+        </div>
+        <div class="form-group">
+            <button onclick="createUser()">Add User</button>
+        </div>
+
+        <!-- User Table -->
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Mobile No</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Users will be populated here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Function to fetch all users and populate the table
+        function getAllUsers() {
+            fetch('/api/users/ui')
+                .then(response => response.json())
+                .then(users => {
+                    const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                    userTable.innerHTML = '';
+                    users.forEach(user => {
+                        const row = userTable.insertRow();
+                        row.insertCell(0).innerText = user.id;
+                        row.insertCell(1).innerText = user.name;
+                        row.insertCell(2).innerText = user.email;
+                        row.insertCell(3).innerText = user.gender;
+                        row.insertCell(4).innerText = user.mobileNo;
+                        row.insertCell(5).innerText = user.address;
+                        const actionsCell = row.insertCell(6);
+                        actionsCell.innerHTML = `
+                            <button onclick="editUser(${user.id})">Edit</button>
+                            <button onclick="deleteUser(${user.id})">Delete</button>
+                        `;
+                    });
+                });
+        }
+
+        // Function to create a new user
+        function createUser() {
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                gender: document.getElementById('gender').value,
+                mobileNo: document.getElementById('mobileNo').value,
+                address: document.getElementById('address').value
+            };
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                getAllUsers();
+                clearForm();
+            });
+        }
+
+        // Function to delete a user
+        function deleteUser(id) {
+            fetch(`/api/users/${id}`, {
+                method: 'DELETE'
+            })
+            .then(() => getAllUsers());
+        }
+
+        // Function to edit a user
+        function editUser(id) {
+            // Populate form with user data and update the user on submit
+            fetch(`/api/users/${id}`)
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('name').value = user.name;
+                    document.getElementById('email').value = user.email;
+                    document.getElementById('gender').value = user.gender;
+                    document.getElementById('mobileNo').value = user.mobileNo;
+                    document.getElementById('address').value = user.address;
+                    const updateButton = document.createElement('button');
+                    updateButton.innerText = 'Update User';
+                    updateButton.onclick = () => updateUser(id);
+                    document.querySelector('.form-group:last-child').appendChild(updateButton);
+                });
+        }
+
+        // Function to update a user
+        function updateUser(id) {
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                gender: document.getElementById('gender').value,
+                mobileNo: document.getElementById('mobileNo').value,
+                address: document.getElementById('address').value
+            };
+            fetch(`/api/users/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(() => {
+                fetchAllUsers();
+                clearForm();
+                document.querySelector('button[onclick="updateUser(${id})"]').remove();
+            });
+        }
+
+        // Function to clear the form
+        function clearForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('mobileNo').value = '';
+            document.getElementById('address').value = '';
+        }
+
+        // Fetch all users on page load
+        window.onload = getAllUsers;
+    </script>
+</body>
+</html>

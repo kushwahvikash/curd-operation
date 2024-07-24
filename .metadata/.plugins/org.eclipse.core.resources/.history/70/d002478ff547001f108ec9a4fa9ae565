@@ -1,0 +1,20 @@
+package com.vikas.co.services;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.vikas.co.entity.User;
+import com.vikas.co.repository.UserRepository;
+@Service
+
+public class UserServicesImpl implements UserServices {
+	@Autowired
+	private UserRepository userRepository; 
+
+	@Override
+	public User addUser(User user) {
+		
+		return userRepository.save(user);
+	}
+
+}

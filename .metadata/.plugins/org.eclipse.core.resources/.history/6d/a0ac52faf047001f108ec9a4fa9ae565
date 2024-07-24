@@ -1,0 +1,5 @@
+package com.vikas.co.entity;
+
+public class User {
+
+}

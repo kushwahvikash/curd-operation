@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .form-group .form-control {
+            display: block;
+            padding: 10px;
+            width: 100%;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>View Form</h2>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <div class="form-control" id="name">John Doe</div>
+        </div>
+        
+        <div class="form-group">
+            <label>Gender:</label>
+            <div class="form-control" id="gender">Male</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <div class="form-control" id="email">john.doe@example.com</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <div class="form-control" id="password">********</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="mobileno">Mobile Number:</label>
+            <div class="form-control" id="mobileno">1234567890</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <div class="form-control" id="address">123 Main Street, City, Country</div>
+        </div>
+    </div>
+</body>
+</html>

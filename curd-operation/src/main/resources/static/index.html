@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .form-container, .edit-container {
+            margin-bottom: 20px;
+        }
+        .form-container h2, .edit-container h2 {
+            margin-bottom: 10px;
+        }
+        .form-container input, .form-container select, .form-container button,
+        .edit-container input, .edit-container select, .edit-container button {
+            width: calc(100% - 20px);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .form-container button, .edit-container button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-container button:hover, .edit-container button:hover {
+            background-color: #218838;
+        }
+        .edit-container {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn-edit {
+            background-color: #007bff;
+        }
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+        .show-form {
+            display: block;
+        }
+        .hide-form {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Management</h1>
+    <div class="container">
+        <!-- Add User Button -->
+        <button onclick="showAddForm()" class="btn btn-edit">Add User</button>
+        
+        <!-- Add User Form -->
+        <div class="form-container">
+            <h2>Add User</h2>
+            <input type="text" id="name" placeholder="Name">
+            <input type="email" id="email" placeholder="Email">
+            <select id="gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <input type="text" id="mobileNo" placeholder="Mobile No">
+            <input type="text" id="address" placeholder="Address">
+            <button onclick="addUser()">Add User</button>
+        </div>
+
+        <!-- Edit User Form -->
+        <div class="edit-container">
+            <h2>Edit User</h2>
+            <input type="hidden" id="editId">
+            <input type="text" id="editName" placeholder="Name">
+            <input type="email" id="editEmail" placeholder="Email">
+            <select id="editGender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <input type="text" id="editMobileNo" placeholder="Mobile No">
+            <input type="text" id="editAddress" placeholder="Address">
+            <button onclick="updateUser()">Update User</button>
+            <button onclick="cancelEdit()">Cancel</button>
+        </div>
+
+        <!-- User Table -->
+        <h2>All Users</h2>
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Mobile No</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Content -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let currentEditId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+
+        function loadUsers() {
+            fetch('/api/users')
+                .then(response => response.json())
+                .then(users => {
+                    const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                    userTable.innerHTML = '';
+                    users.forEach(user => {
+                        const row = userTable.insertRow();
+                        row.insertCell(0).innerHTML = user.id;
+                        row.insertCell(1).innerHTML = user.name;
+                        row.insertCell(2).innerHTML = user.email;
+                        row.insertCell(3).innerHTML = user.gender;
+                        row.insertCell(4).innerHTML = user.mobileNo;
+                        row.insertCell(5).innerHTML = user.address;
+                        const actionsCell = row.insertCell(6);
+                        actionsCell.innerHTML = `<button class="btn btn-edit" onclick="editUser(${user.id})">Edit</button>
+                                                 <button class="btn btn-delete" onclick="deleteUser(${user.id})">Delete</button>`;
+                    });
+                });
+        }
+
+        function addUser() {
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                gender: document.getElementById('gender').value,
+                mobileNo: document.getElementById('mobileNo').value,
+                address: document.getElementById('address').value
+            };
+
+            fetch('/api/users/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            }).then(response => {
+                if (response.status === 201) {
+                    loadUsers();
+                    resetAddForm();
+                    showAddForm(); // Ensure add form is visible after adding
+                }
+            });
+        }
+
+        function editUser(id) {
+            fetch(`/api/users/${id}`)
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('editId').value = user.id;
+                    document.getElementById('editName').value = user.name;
+                    document.getElementById('editEmail').value = user.email;
+                    document.getElementById('editGender').value = user.gender;
+                    document.getElementById('editMobileNo').value = user.mobileNo;
+                    document.getElementById('editAddress').value = user.address;
+                    toggleForms(true);
+                    currentEditId = id;
+                });
+        }
+
+        function updateUser() {
+            const user = {
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                gender: document.getElementById('editGender').value,
+                mobileNo: document.getElementById('editMobileNo').value,
+                address: document.getElementById('editAddress').value
+            };
+
+            fetch(`/api/users/${currentEditId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            }).then(response => {
+                if (response.status === 200) {
+                    loadUsers();
+                    toggleForms(false);
+                }
+            });
+        }
+
+        function deleteUser(id) {
+            fetch(`/api/users/${id}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.status === 204) {
+                    loadUsers();
+                }
+            });
+        }
+
+        function toggleForms(isEdit) {
+            document.querySelector('.form-container').style.display = isEdit ? 'none' : 'block';
+            document.querySelector('.edit-container').style.display = isEdit ? 'block' : 'none';
+        }
+
+        function resetAddForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('mobileNo').value = '';
+            document.getElementById('address').value = '';
+        }
+
+        function showAddForm() {
+            toggleForms(false);
+            resetAddForm();
+        }
+
+        function cancelEdit() {
+            toggleForms(false);
+        }
+    </script>
+</body>
+</html>

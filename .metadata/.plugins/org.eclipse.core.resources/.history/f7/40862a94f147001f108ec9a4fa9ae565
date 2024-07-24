@@ -1,0 +1,5 @@
+package com.vikas.co.services;
+
+public interface UserServices {
+
+}
